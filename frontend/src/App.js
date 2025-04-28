@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { io } from 'socket.io-client';
 
-const socket = io('http://localhost:5000'); // later change to Vercel URL
+const socket = io('https://enteract.onrender.com'); // later change to Vercel URL
 
 function App() {
     const [alias, setAlias] = useState('');
