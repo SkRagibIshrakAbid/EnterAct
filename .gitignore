@@ -1,0 +1,50 @@
+# Node modules
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+pnpm-debug.log
+
+# Logs
+logs
+*.log
+logs/**/*.log
+
+# dotenv environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build output (React)
+frontend/build/
+
+# Build output (Backend if you have it)
+backend/dist/
+backend/build/
+
+# Vercel
+.vercel/
+
+# Coverage reports
+coverage/
+
+# IDE files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Optional: Ignore Mac system files
+*.DS_Store
+
+# Optional: Ignore Windows system files
+ehthumbs.db
+Icon?
