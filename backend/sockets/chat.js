@@ -27,9 +27,10 @@ module.exports = (io) => {
             io.to(roomId).emit('receive_message', { sender: socket.alias, message });
         });
 
-        socket.on('disconnect', () => {
+        socket.on('disconnect', ({roomId}) => {
             console.log('User disconnected:', socket.id);
             queue = queue.filter(s => s.id !== socket.id);
+            io.to(roomId).emit('receive_message', { sender: socket.alias, message: 'User has left the chat.' });
         });
     });
 };

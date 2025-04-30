@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react'; // Added useRef
 import { io } from 'socket.io-client';
 import './index.css';
 
@@ -10,18 +10,15 @@ function App() {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const [waitingForMatch, setWaitingForMatch] = useState(false);
+    const inputRef = useRef(null); // Create a reference for the input box
 
     useEffect(() => {
         socket.on('chat_started', ({ roomId }) => {
             setRoomId(roomId);
-            setWaitingForMatch(false);  // Stop waiting when the chat starts
+            setWaitingForMatch(false); // Stop waiting when the chat starts
         });
         socket.on('receive_message', ({ sender, message }) => {
-            setMessages(prev =>
-                prev.some(msg => msg.message === message)
-                    ? prev
-                    : [...prev, { sender, message }]
-            );
+            setMessages(prev => [...prev, { sender, message }]); // Always add the new message
         });
         return () => {
             socket.off('chat_started');
@@ -39,12 +36,19 @@ function App() {
         if (input.trim()) {
             socket.emit('send_message', { roomId, message: input });
             setInput('');
+            inputRef.current?.focus(); // Keep focus on the input box
         }
     };
 
     const handleKeyPress = (e) => {
         if (e.key === 'Enter') {
             sendMessage();
+        }
+    };
+
+    const handleKeyPressAlias = (e) => {
+        if (e.key === 'Enter') {
+            startChat();
         }
     };
 
@@ -62,6 +66,7 @@ function App() {
                             value={alias}
                             onChange={e => setAlias(e.target.value)}
                             placeholder="Enter alias"
+                            onKeyDown={handleKeyPressAlias}
                         />
                         <button onClick={startChat}>Start Chat</button>
                     </div>
@@ -74,7 +79,7 @@ function App() {
                                 key={idx}
                                 className={`message ${msg.sender === alias ? 'self' : 'other'}`}
                             >
-                                {msg.message}
+                                <strong>{msg.sender}:</strong> {msg.message}
                             </div>
                         ))}
                     </div>
@@ -85,6 +90,7 @@ function App() {
                             onChange={e => setInput(e.target.value)}
                             placeholder="Type a message..."
                             onKeyDown={handleKeyPress}
+                            ref={inputRef} // Attach the reference to the input box
                         />
                         <button onClick={sendMessage}>Send</button>
                     </div>
