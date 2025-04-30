@@ -1,13 +1,138 @@
+/* General Body Styles */
 body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #e5e5e5;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/* Chat Container */
+.container {
+  max-width: 400px;
+  margin: 5% auto;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  height: 80vh;
+  justify-content: space-between;
+}
+
+/* Heading */
+h1 {
+  text-align: center;
+  color: #007bff;
+  font-size: 1.5em;
+  margin-bottom: 20px;
+}
+
+/* Input/Buttons for Alias */
+input, button {
+  padding: 10px;
+  font-size: 16px;
+}
+
+input {
+  flex: 1;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+button {
+  background-color: #007bff;
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-left: 8px;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+/* Chat Messages Container */
+.messages {
+  max-height: calc(100vh - 240px);
+  overflow-y: auto;
+  margin-bottom: 10px;
+  padding-right: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Message Bubble Styles */
+.message {
+  max-width: 70%;
+  padding: 12px;
+  border-radius: 20px;
+  font-size: 16px;
+  background-color: #f1f1f1;
+  line-height: 1.4;
+  word-wrap: break-word;
+  position: relative;
+}
+
+.message.self {
+  background-color: #007bff;
+  color: white;
+  align-self: flex-end;
+  margin-left: auto;
+}
+
+.message.other {
+  background-color: #f1f1f1;
+  color: #333;
+  align-self: flex-start;
+}
+
+.message strong {
+  font-weight: bold;
+}
+
+/* Input Field Styling */
+input[type="text"] {
+  flex: 1;
+  border-radius: 25px;
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  margin-right: 8px;
+}
+
+button {
+  border-radius: 25px;
+  padding: 12px 20px;
+  font-size: 16px;
+  background-color: #007bff;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.waiting-container {
+  background-color: #f7f7f7;
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  margin-top: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.waiting-message {
+  font-size: 1.2em;
+  color: #007bff;
+  margin: 0;
 }
