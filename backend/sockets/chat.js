@@ -13,10 +13,14 @@ module.exports = (io) => {
                 const user2 = queue.shift();
 
                 const roomId = `${user1.id}#${user2.id}`;
+                user1.roomId = roomId; // Store roomId for user1
+                user2.roomId = roomId; // Store roomId for user2
                 user1.join(roomId);
                 user2.join(roomId);
 
-                io.to(roomId).emit('chat_started', { roomId, users: [user1.alias, user2.alias] });
+                // Notify both users that the chat has started
+                user1.emit('chat_started', { roomId, otherAlias: user2.alias });
+                user2.emit('chat_started', { roomId, otherAlias: user1.alias });
             }
         });
 
@@ -27,10 +31,19 @@ module.exports = (io) => {
             io.to(roomId).emit('receive_message', { sender: socket.alias, message });
         });
 
-        socket.on('disconnect', ({roomId}) => {
+        socket.on('disconnect', () => {
             console.log('User disconnected:', socket.id);
+
+            // Remove the user from the queue if they were waiting
             queue = queue.filter(s => s.id !== socket.id);
-            io.to(roomId).emit('receive_message', { sender: socket.alias, message: 'User has left the chat.' });
+
+            // Notify the room that the user has left
+            if (socket.roomId) {
+                io.to(socket.roomId).emit('receive_message', {
+                    sender: 'System',
+                    message: `${socket.alias} has left the chat.`,
+                });
+            }
         });
     });
 };
