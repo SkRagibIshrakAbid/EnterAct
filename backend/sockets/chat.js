@@ -41,7 +41,7 @@ module.exports = (io) => {
             if (socket.roomId) {
                 io.to(socket.roomId).emit('receive_message', {
                     sender: 'System',
-                    message: `${socket.alias} has left the chat.`,
+                    message: `${socket.alias} has left the chat. Refresh to start a new chat.`,
                 });
             }
         });
