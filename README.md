@@ -7,13 +7,11 @@ Connect randomly, chat freely, and interact anonymously. No minors allowed.
 
 ## 🚀 Features
 
-- 🔥 Anonymous Sign-up/Login
 - 🎭 Alias (nickname) based chatting
 - 🔄 Random matching with other users
 - 💬 Real-time chat system (powered by WebSocket)
 - 🚪 Option to start a new conversation anytime
-- 🛡️ Basic spam moderation (anti-link & spam detection)
-- 🔒 No minors allowed for safety
+- 🛡️ Basic spam moderation (anti-link detection)
 
 ---
 
