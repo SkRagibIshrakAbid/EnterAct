@@ -11,7 +11,6 @@ function App() {
     const [input, setInput] = useState('');
     const [waitingForMatch, setWaitingForMatch] = useState(false);
     const [showModal, setShowModal] = useState(true);
-    const [activeUsers, setActiveUsers] = useState(0); // State for active users
     const inputRef = useRef(null);
     const messagesEndRef = useRef(null);
 
@@ -22,11 +21,6 @@ function App() {
         });
         socket.on('receive_message', ({ sender, message }) => {
             setMessages(prev => [...prev, { sender, message }]);
-        });
-
-        // Listen for active user count updates
-        socket.on('active_users', (count) => {
-            setActiveUsers(count);
         });
 
         return () => {
@@ -85,7 +79,7 @@ function App() {
                         <h2>Welcome to EnterAct!</h2>
                         <p>Here you can chat with a random person by entering your alias.</p>
                         <p>Once matched, you can send messages back and forth.</p>
-                        <p>Refresh the page to start again🔄</p>
+                        <p>Refresh the page to start fresh again🔄</p>
                     </div>
                 </div>
             )}
