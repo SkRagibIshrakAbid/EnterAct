@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'; // Added useRef
+import { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import './index.css';
 
@@ -10,15 +10,16 @@ function App() {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const [waitingForMatch, setWaitingForMatch] = useState(false);
-    const inputRef = useRef(null); // Create a reference for the input box
+    const [showModal, setShowModal] = useState(true);  // State to control the modal visibility
+    const inputRef = useRef(null);
 
     useEffect(() => {
         socket.on('chat_started', ({ roomId }) => {
             setRoomId(roomId);
-            setWaitingForMatch(false); // Stop waiting when the chat starts
+            setWaitingForMatch(false);
         });
         socket.on('receive_message', ({ sender, message }) => {
-            setMessages(prev => [...prev, { sender, message }]); // Always add the new message
+            setMessages(prev => [...prev, { sender, message }]);
         });
         return () => {
             socket.off('chat_started');
@@ -36,7 +37,7 @@ function App() {
         if (input.trim()) {
             socket.emit('send_message', { roomId, message: input });
             setInput('');
-            inputRef.current?.focus(); // Keep focus on the input box
+            inputRef.current?.focus();
         }
     };
 
@@ -52,8 +53,29 @@ function App() {
         }
     };
 
+    const closeModal = () => {
+        setShowModal(false);  // Close modal
+    };
+
+    const handleClickOutside = (e) => {
+        if (e.target.id === 'modal-container') {
+            closeModal();  // Close modal if clicked outside
+        }
+    };
+
     return (
-        <div className="container">
+        <div className="container" onClick={handleClickOutside}>
+            {showModal && (
+                <div id="modal-container" className="modal">
+                    <div className="modal-content">
+                        <button className="close-btn" onClick={closeModal}>×</button>
+                        <h2>Welcome to the Chat!</h2>
+                        <p>Here you can chat with a random person by entering your alias.</p>
+                        <p>Once matched, you can send messages back and forth.</p>
+                        <p>Refresh the page to start again🔄</p>
+                    </div>
+                </div>
+            )}
             {!roomId && waitingForMatch ? (
                 <div className="waiting-container">
                     <p className="waiting-message">Waiting for a match...</p>
@@ -90,7 +112,7 @@ function App() {
                             onChange={e => setInput(e.target.value)}
                             placeholder="Type a message..."
                             onKeyDown={handleKeyPress}
-                            ref={inputRef} // Attach the reference to the input box
+                            ref={inputRef}
                         />
                         <button onClick={sendMessage}>Send</button>
                     </div>
