@@ -1,4 +1,6 @@
+const Ad = require('../models/Ad'); // Import the Ad model
 let queue = [];
+let activeRooms = new Set(); // Track active chat rooms
 
 module.exports = (io) => {
     io.on('connection', (socket) => {
@@ -13,12 +15,13 @@ module.exports = (io) => {
                 const user2 = queue.shift();
 
                 const roomId = `${user1.id}#${user2.id}`;
-                user1.roomId = roomId; // Store roomId for user1
-                user2.roomId = roomId; // Store roomId for user2
+                user1.roomId = roomId;
+                user2.roomId = roomId;
                 user1.join(roomId);
                 user2.join(roomId);
 
-                // Notify both users that the chat has started
+                activeRooms.add(roomId); // Add room to active rooms
+
                 user1.emit('chat_started', { roomId, otherAlias: user2.alias });
                 user2.emit('chat_started', { roomId, otherAlias: user1.alias });
             }
@@ -34,16 +37,35 @@ module.exports = (io) => {
         socket.on('disconnect', () => {
             console.log('User disconnected:', socket.id);
 
-            // Remove the user from the queue if they were waiting
             queue = queue.filter(s => s.id !== socket.id);
 
-            // Notify the room that the user has left
             if (socket.roomId) {
                 io.to(socket.roomId).emit('receive_message', {
                     sender: 'System',
                     message: `${socket.alias} has left the chat. Refresh to start a new chat.`,
                 });
+
+                activeRooms.delete(socket.roomId); // Remove room from active rooms
             }
         });
     });
+
+    // Broadcast ads to active rooms every 2 minutes
+    setInterval(async () => {
+        try {
+            const ad = await Ad.findOne(); // Fetch one ad from the database
+            if (!ad) return;
+
+            const adMessage = `Ad: ${ad.name} by ${ad.madeBy}\n${ad.description}\nCheck it out: ${ad.link}`;
+
+            activeRooms.forEach((roomId) => {
+                io.to(roomId).emit('receive_message', {
+                    sender: 'Ad',
+                    message: adMessage
+                });
+            });
+        } catch (err) {
+            console.error('Error fetching ads:', err);
+        }
+    }, 120000); // 2 minutes in milliseconds
 };
