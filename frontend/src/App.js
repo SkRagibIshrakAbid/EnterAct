@@ -10,8 +10,10 @@ function App() {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const [waitingForMatch, setWaitingForMatch] = useState(false);
-    const [showModal, setShowModal] = useState(true);  // State to control the modal visibility
+    const [showModal, setShowModal] = useState(true);
+    const [activeUsers, setActiveUsers] = useState(0); // State for active users
     const inputRef = useRef(null);
+    const messagesEndRef = useRef(null);
 
     useEffect(() => {
         socket.on('chat_started', ({ roomId }) => {
@@ -21,11 +23,22 @@ function App() {
         socket.on('receive_message', ({ sender, message }) => {
             setMessages(prev => [...prev, { sender, message }]);
         });
+
+        // Listen for active user count updates
+        socket.on('active_users', (count) => {
+            setActiveUsers(count);
+        });
+
         return () => {
             socket.off('chat_started');
             socket.off('receive_message');
+            socket.off('active_users');
         };
     }, []);
+
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [messages]);
 
     const startChat = () => {
         if (!alias.trim()) return;
@@ -54,12 +67,12 @@ function App() {
     };
 
     const closeModal = () => {
-        setShowModal(false);  // Close modal
+        setShowModal(false);
     };
 
     const handleClickOutside = (e) => {
         if (e.target.id === 'modal-container') {
-            closeModal();  // Close modal if clicked outside
+            closeModal();
         }
     };
 
@@ -69,7 +82,7 @@ function App() {
                 <div id="modal-container" className="modal">
                     <div className="modal-content">
                         <button className="close-btn" onClick={closeModal}>×</button>
-                        <h2>Welcome to the Chat!</h2>
+                        <h2>Welcome to EnterAct!</h2>
                         <p>Here you can chat with a random person by entering your alias.</p>
                         <p>Once matched, you can send messages back and forth.</p>
                         <p>Refresh the page to start again🔄</p>
@@ -82,7 +95,8 @@ function App() {
                 </div>
             ) : !roomId ? (
                 <>
-                    <h1>Enter your alias to start</h1>
+                    <h1>Enter your alias to start <br />
+                    Active users: {activeUsers}</h1> {/* Display active users */}
                     <div style={{ display: 'flex', gap: '8px' }}>
                         <input
                             value={alias}
@@ -104,6 +118,7 @@ function App() {
                                 <strong>{msg.sender}:</strong> {msg.message}
                             </div>
                         ))}
+                        <div ref={messagesEndRef} />
                     </div>
                     <div style={{ display: 'flex' }}>
                         <input
