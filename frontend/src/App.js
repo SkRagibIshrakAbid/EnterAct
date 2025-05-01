@@ -95,8 +95,7 @@ function App() {
                 </div>
             ) : !roomId ? (
                 <>
-                    <h1>Enter your alias to start <br />
-                    Active users: {activeUsers}</h1> {/* Display active users */}
+                    <h1>Enter your alias to start</h1>
                     <div style={{ display: 'flex', gap: '8px' }}>
                         <input
                             value={alias}

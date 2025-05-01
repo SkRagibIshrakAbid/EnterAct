@@ -1,13 +1,8 @@
 let queue = [];
-let activeUsers = new Set(); // Track active users
 
 module.exports = (io) => {
     io.on('connection', (socket) => {
         console.log('User connected:', socket.id);
-        activeUsers.add(socket.id); // Add user to active users
-
-        // Emit the updated active user count to all clients
-        io.emit('active_users', activeUsers.size);
 
         socket.on('start_chat', (alias) => {
             socket.alias = alias;
@@ -18,11 +13,12 @@ module.exports = (io) => {
                 const user2 = queue.shift();
 
                 const roomId = `${user1.id}#${user2.id}`;
-                user1.roomId = roomId;
-                user2.roomId = roomId;
+                user1.roomId = roomId; // Store roomId for user1
+                user2.roomId = roomId; // Store roomId for user2
                 user1.join(roomId);
                 user2.join(roomId);
 
+                // Notify both users that the chat has started
                 user1.emit('chat_started', { roomId, otherAlias: user2.alias });
                 user2.emit('chat_started', { roomId, otherAlias: user1.alias });
             }
@@ -40,12 +36,6 @@ module.exports = (io) => {
 
             // Remove the user from the queue if they were waiting
             queue = queue.filter(s => s.id !== socket.id);
-
-            // Remove user from active users
-            activeUsers.delete(socket.id);
-
-            // Emit the updated active user count to all clients
-            io.emit('active_users', activeUsers.size);
 
             // Notify the room that the user has left
             if (socket.roomId) {
