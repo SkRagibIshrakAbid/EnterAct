@@ -28,6 +28,42 @@ module.exports = (io) => {
         });
 
         socket.on('send_message', ({ roomId, message }) => {
+            if (message.trim() === '!next') {
+                // Handle the !next command
+                if (socket.roomId) {
+                    io.to(socket.roomId).emit('receive_message', {
+                        sender: 'System',
+                        message: `${socket.alias} has left the chat to find a new match.`,
+                    });
+
+                    activeRooms.delete(socket.roomId); // Remove the room from active rooms
+                    socket.leave(socket.roomId); // Leave the current room
+                    socket.roomId = null; // Reset the roomId
+                }
+
+                // Add the user back to the queue
+                queue.push(socket);
+
+                // Try to match users again
+                if (queue.length >= 2) {
+                    const user1 = queue.shift();
+                    const user2 = queue.shift();
+
+                    const newRoomId = `${user1.id}#${user2.id}`;
+                    user1.roomId = newRoomId;
+                    user2.roomId = newRoomId;
+                    user1.join(newRoomId);
+                    user2.join(newRoomId);
+
+                    activeRooms.add(newRoomId); // Add the new room to active rooms
+
+                    user1.emit('chat_started', { roomId: newRoomId, otherAlias: user2.alias });
+                    user2.emit('chat_started', { roomId: newRoomId, otherAlias: user1.alias });
+                }
+                return;
+            }
+
+            // Regular message handling
             if (/(http:\/\/|https:\/\/)/gi.test(message)) {
                 return; // Block links
             }
