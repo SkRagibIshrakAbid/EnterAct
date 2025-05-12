@@ -33,7 +33,7 @@ module.exports = (io) => {
                 if (socket.roomId) {
                     io.to(socket.roomId).emit('receive_message', {
                         sender: 'System',
-                        message: `${socket.alias} has left the chat to find a new match.`,
+                        message: `${socket.alias} has left the chat to find a new match. Type !next to find another user to talk to.`,
                     });
 
                     activeRooms.delete(socket.roomId); // Remove the room from active rooms

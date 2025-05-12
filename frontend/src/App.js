@@ -15,10 +15,12 @@ function App() {
     const messagesEndRef = useRef(null);
 
     useEffect(() => {
-        socket.on('chat_started', ({ roomId }) => {
+        socket.on('chat_started', ({ roomId, otherAlias }) => {
             setRoomId(roomId);
-            setWaitingForMatch(false);
+            setMessages([]); // Clear previous messages
+            setWaitingForMatch(false); // Stop waiting for a match
         });
+
         socket.on('receive_message', ({ sender, message }) => {
             setMessages(prev => [...prev, { sender, message }]);
         });
@@ -26,7 +28,6 @@ function App() {
         return () => {
             socket.off('chat_started');
             socket.off('receive_message');
-            socket.off('active_users');
         };
     }, []);
 
@@ -42,6 +43,12 @@ function App() {
 
     const sendMessage = () => {
         if (input.trim()) {
+            if (input.trim() === '!next') {
+                // Handle the !next command
+                setRoomId(null); // Reset the roomId
+                setMessages([]); // Clear the chat messages
+                setWaitingForMatch(true); // Show waiting for match
+            }
             socket.emit('send_message', { roomId, message: input });
             setInput('');
             inputRef.current?.focus();
@@ -80,6 +87,7 @@ function App() {
                         <p>Here you can chat with a random person by entering your alias.</p>
                         <p>Once matched, you can send messages back and forth.</p>
                         <p>Refresh the page to start fresh again🔄</p>
+                        <p>Note: You can type <strong>!next</strong> at any time to find a new match.</p>
                     </div>
                 </div>
             )}
